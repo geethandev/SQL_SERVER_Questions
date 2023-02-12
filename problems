@@ -1,0 +1,132 @@
+QUESTION ONE 
+-- TABLE CREATION AND VALUE INSERTION:
+create table Geethan.Subscription(
+Userid int primary key , Startdate date , Enddate date)
+select * from Geethan.Subscription
+
+insert into Geethan.Subscription (Userid , Startdate , Enddate) values 
+(2, '2020-01-16','2020-01-26'),
+(3, '2020-01-28','2020-02-06'),
+(4, '2020-02-16','2020-02-26')
+-- QUESTION ONE SOLUTION : 
+select 
+*, 
+case when exists (
+      select * 
+      from 
+        Geethan.Subscription as t1 
+      where 
+        t1.UserID <> Geethan.Subscription.UserID 
+        AND t1.StartDate BETWEEN Geethan.Subscription.StartDate AND Geethan.Subscription.EndDate
+    ) then 'True' 
+    else 'False' 
+  end as Overlap
+from 
+  Geethan.Subscription
+  
+  --------------------------------------------------------------------------
+create table [Geethan].[Department] (
+DepartmentID varchar(10) primary key ,
+DepartmentName varchar(10) not null,
+)
+
+
+
+insert into Geethan.Department (Departmentid , Departmentname) values 
+('D101', 'ECE'),
+('D102', 'CSE'),
+('D103','MECH'),
+('D104', 'IT'),
+('D105', 'EEE')
+select * from Geethan.Department
+select * from Geethan.Student
+
+create table [Geethan].[Student](
+StudentID int primary key not null,
+DepartmentID varchar(10) not null,
+Gender varchar(2) not null,
+Mark int not null,
+FOREIGN KEY (DepartmentID) REFERENCES [Geethan].[Department](DepartmentID)
+)
+go
+
+
+select * from Geethan.Student
+insert into Geethan.Student (Studentid , Departmentid,Gender,Marks) values 
+(1,'D101','M',80),(2,'D103','F',60),(3,'D104','M',40),(4,'D101','F',20),(5,'D103','M',90),(6,'D104','F',100),(7,'D101','F',80),(8,'D103','F',70),(9,'D102','M',100),(10,'D102','F',80)
+  
+  select Department.DepartmentName ,Student.StudentID ,Student.Mark
+from  [Geethan].[Department]
+join Geethan.Student
+on [Department].DepartmentID =[Student].[DepartmentID]
+where Mark =
+(select max(Mark) from [Geethan].[Student])
+order by Mark 
+
+  
+  
+  
+  
+----------------------------------------------------------------------------  
+  
+drop table Geethan.Salesdetails
+create table Geethan.Salesdetails (orderid int primary key , quantity int , unitprice int , taxrate float , orderdate date)
+insert into Geethan.Salesdetails (orderid , quantity , unitprice , taxrate ,orderdate) values
+(1,5,2000,5,'2020-10-10'),(2,4,5000,4,'2020-09-09'),(3,9,1000,8,'2022-10-04'),(4,8,3500,2,'2022-04-05'),(5,10,5000,6,'2020-07-04')
+select * from Geethan.Salesdetails
+-- QUESTION THREE FUNCTION CREATION
+create function Calc_tax (@orderid int)
+returns table as 
+return 
+select orderid,(quantity*unitprice) *(taxrate/100) as totaltaxprice , unitprice * (taxrate/100) as taxperunit from alexander.Salesdetails where orderid = @orderid
+
+select * from Calc_tax(2)
+
+
+------------------------------------------------------------------------------------------
+
+create table Geethan.EmployeeDetials (
+employee_id int primary key identity(1,1),
+Name varchar(50) not null,
+Manage_id int not null,
+Date_of_Joining date,
+)
+go
+
+create table Geethan.EmployeeSalary (
+employee_id int not null identity(1,1),
+Project_Name varchar(3),
+Salary int,
+FOREIGN KEY (Employee_id) REFERENCES Geethan.EmployeeDetials (employee_id)
+)
+go
+
+insert into  Geethan.EmployeeDetials  values
+('geethan',100,'20000801'),
+('Nisha',101,'20000901'),
+('naruto',102,'20000908')
+go
+
+insert into Geethan.EmployeeSalary values
+('P1',25000),
+('P2',30000),
+('P3',35000),
+
+
+go
+
+
+SELECT COUNT(Geethan.EmployeeSalary.employee_id) as employees_working_on_P1 FROM Geethan.EmployeeSalary where Project_Name = 'P1'
+
+select Name from Geethan.EmployeeDetials 
+join  Geethan.EmployeeSalary 
+on EmployeeDetials.employee_id = EmployeeSalary.employee_id
+where Salary>=25000 and Salary <=35000;
+
+go
+
+select Project_Name, Count(employee_id) employee_count
+FROM Geethan.EmployeeSalary
+Group By Project_Name
+Order By employee_count DESC;
+
